@@ -13,14 +13,12 @@ services:
     plan: free
     region: oregon
     buildCommand: npm i -g pnpm@11.21.0 && pnpm install --no-frozen-lockfile && pnpm --filter @school/types build && pnpm --filter api db:generate && pnpm --filter api build
-    startCommand: pnpm --filter api exec prisma db push --accept-data-loss && pnpm --filter api db:seed && node apps/api/dist/main.js
+    startCommand: pnpm --filter api exec prisma db push --accept-data-loss && (pnpm --filter api db:seed || true) && node apps/api/dist/main.js
     envVars:
       - key: SKIP_INSTALL_DEPS
         value: "true"
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 4000
       - key: DATABASE_URL
         fromDatabase:
           name: school-erp-db
