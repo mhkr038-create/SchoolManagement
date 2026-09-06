@@ -13,8 +13,7 @@ services:
     plan: free
     region: oregon
     buildCommand: pnpm install && pnpm --filter @school/types build && pnpm --filter api db:generate && pnpm --filter api build
-    preDeployCommand: pnpm --filter api exec prisma db push --accept-data-loss
-    startCommand: node apps/api/dist/main.js
+    startCommand: pnpm --filter api exec prisma db push --accept-data-loss && node apps/api/dist/main.js
     envVars:
       - key: NODE_ENV
         value: production
