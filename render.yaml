@@ -1,19 +1,19 @@
-﻿databases:
+databases:
   - name: school-erp-db
     databaseName: school_management
     user: school_admin
     plan: free
-    region: singapore
+    region: oregon
 
 services:
   # 1. Backend NestJS Web Service
   - type: web
     name: school-erp-api
-    env: node
+    runtime: node
     plan: free
-    region: singapore
-    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @school/types build && pnpm --filter api db:generate && pnpm --filter api build
-    startCommand: pnpm --filter api exec prisma migrate deploy && node apps/api/dist/main.js
+    region: oregon
+    buildCommand: corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile && pnpm --filter @school/types build && pnpm --filter api db:generate && pnpm --filter api build
+    startCommand: corepack enable && corepack prepare pnpm@latest --activate && pnpm --filter api exec prisma migrate deploy && node apps/api/dist/main.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -31,10 +31,10 @@ services:
   # 2. Frontend React Vite Static Site
   - type: web
     name: school-erp-web
-    env: static
+    runtime: static
     plan: free
-    region: singapore
-    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @school/types build && pnpm --filter web build
+    region: oregon
+    buildCommand: corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile && pnpm --filter @school/types build && pnpm --filter web build
     staticPublishPath: apps/web/dist
     routes:
       - type: rewrite
