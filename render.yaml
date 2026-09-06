@@ -12,8 +12,9 @@ services:
     runtime: node
     plan: free
     region: oregon
-    buildCommand: corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile && pnpm --filter @school/types build && pnpm --filter api db:generate && pnpm --filter api build
-    startCommand: corepack enable && corepack prepare pnpm@latest --activate && pnpm --filter api exec prisma migrate deploy && node apps/api/dist/main.js
+    buildCommand: pnpm install && pnpm --filter @school/types build && pnpm --filter api db:generate && pnpm --filter api build
+    preDeployCommand: pnpm --filter api exec prisma db push --accept-data-loss
+    startCommand: node apps/api/dist/main.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -32,7 +33,7 @@ services:
   - type: web
     name: school-erp-web
     runtime: static
-    buildCommand: corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile && pnpm --filter @school/types build && pnpm --filter web build
+    buildCommand: pnpm install && pnpm --filter @school/types build && pnpm --filter web build
     staticPublishPath: apps/web/dist
     envVars:
       - key: VITE_API_URL

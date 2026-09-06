@@ -2,6 +2,10 @@
   "name": "school-management",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@11.21.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "start:db": "node scripts/start-db.js",
     "dev:api": "pnpm --filter api start:dev",
