@@ -23,8 +23,10 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization', 'X-School-Id']
   });
 
-  // Global API Prefix
-  app.setGlobalPrefix('api/v1');
+  // Global API Prefix (exclude health checks and root)
+  app.setGlobalPrefix('api/v1', {
+    exclude: ['/', 'health', 'healthz']
+  });
 
   // Global Validation & Serialization
   app.useGlobalPipes(

@@ -16,7 +16,10 @@ import { TimetableModule } from './modules/timetable/timetable.module';
 import { AssignmentsModule } from './modules/assignments/assignments.module';
 import { AnnouncementsModule } from './modules/announcements/announcements.module';
 
+import { AppController } from './app.controller';
+
 @Module({
+  controllers: [AppController],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
