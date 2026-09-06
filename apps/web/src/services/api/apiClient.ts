@@ -1,10 +1,24 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '../../app/store/useAuthStore';
 
-const envApiUrl = typeof import.meta !== 'undefined' ? (import.meta as any).env?.VITE_API_URL : undefined;
+const getApiBaseUrl = (): string => {
+  // 1. Explicit Vite environment variable replaced at build time
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim() !== '') {
+    return `${envUrl.replace(/\/+$/, '')}/api/v1`;
+  }
+  // 2. Production fallback when running on Render static hosting
+  if (typeof window !== 'undefined' && window.location.hostname.includes('school-erp-web.onrender.com')) {
+    return 'https://school-erp-api.onrender.com/api/v1';
+  }
+  // 3. Default local dev proxy
+  return '/api/v1';
+};
+
+export const apiBaseUrl = getApiBaseUrl();
 
 export const apiClient = axios.create({
-  baseURL: envApiUrl ? `${envApiUrl}/api/v1` : '/api/v1',
+  baseURL: apiBaseUrl,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
@@ -78,7 +92,7 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refreshResponse = await axios.post('/api/v1/auth/refresh', {}, { withCredentials: true });
+        const refreshResponse = await axios.post(`${apiBaseUrl}/auth/refresh`, {}, { withCredentials: true });
         const newAccessToken = refreshResponse.data?.data?.accessToken || refreshResponse.data?.accessToken;
 
         useAuthStore.getState().setAccessToken(newAccessToken);
