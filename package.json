@@ -1,0 +1,26 @@
+{
+  "name": "school-management",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start:db": "node scripts/start-db.js",
+    "dev:api": "pnpm --filter api start:dev",
+    "dev:web": "pnpm --filter web dev",
+    "dev": "concurrently \"pnpm:dev:api\" \"pnpm:dev:web\"",
+    "dev:all": "concurrently -n \"db,api,web\" -c \"cyan,blue,green\" \"pnpm:start:db\" \"pnpm:dev:api\" \"pnpm:dev:web\"",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint",
+    "db:generate": "pnpm --filter api db:generate",
+    "db:push": "pnpm --filter api exec prisma db push",
+    "db:migrate": "pnpm --filter api db:migrate",
+    "db:seed": "pnpm --filter api db:seed",
+    "tunnel": "node scripts/start-tunnel.js",
+    "tunnel:cf": ".\\scripts\\cloudflared.exe tunnel --url http://localhost:5173"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "embedded-postgres": "18.4.0-beta.17",
+    "localtunnel": "^2.0.2",
+    "typescript": "^5.7.3"
+  }
+}
