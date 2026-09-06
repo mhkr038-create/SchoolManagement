@@ -13,6 +13,8 @@ import { AttendanceModule } from './modules/attendance/attendance.module';
 import { ExaminationsModule } from './modules/examinations/examinations.module';
 import { FeesModule } from './modules/fees/fees.module';
 import { TimetableModule } from './modules/timetable/timetable.module';
+import { AssignmentsModule } from './modules/assignments/assignments.module';
+import { AnnouncementsModule } from './modules/announcements/announcements.module';
 
 @Module({
   imports: [
@@ -31,7 +33,9 @@ import { TimetableModule } from './modules/timetable/timetable.module';
     AttendanceModule,
     ExaminationsModule,
     FeesModule,
-    TimetableModule
+    TimetableModule,
+    AssignmentsModule,
+    AnnouncementsModule
   ]
 })
 export class AppModule {}

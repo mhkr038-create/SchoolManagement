@@ -12,7 +12,12 @@ import {
   Button,
   Divider,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  Badge,
+  Popover,
+  List,
+  ListItem,
+  Stack
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -21,10 +26,13 @@ import {
   Apartment as CampusIcon,
   KeyboardArrowDown as ArrowDownIcon,
   Check as CheckIcon,
-  HomeWork as HomeWorkIcon
+  HomeWork as HomeWorkIcon,
+  Notifications as NotificationsIcon,
+  DoneAll as DoneAllIcon,
+  Campaign as AnnouncementIcon
 } from '@mui/icons-material';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Sidebar } from './Sidebar';
 import { useAuthStore } from '../../app/store/useAuthStore';
 import { apiClient } from '../../services/api/apiClient';
@@ -35,10 +43,44 @@ export const AppLayout: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [branchAnchorEl, setBranchAnchorEl] = useState<null | HTMLElement>(null);
+  const [notifAnchorEl, setNotifAnchorEl] = useState<null | HTMLElement>(null);
 
   const queryClient = useQueryClient();
   const { user, school, availableSchools, switchSchool, logout } = useAuthStore();
   const navigate = useNavigate();
+
+  const { data: notifData, refetch: refetchNotifs } = useQuery({
+    queryKey: ['my-notifications'],
+    queryFn: async () => {
+      try {
+        const res = await apiClient.get('/announcements/notifications');
+        return res.data?.data !== undefined ? res.data.data : (res.data || []);
+      } catch (e) {
+        return [];
+      }
+    },
+    refetchInterval: 30000
+  });
+  const notifications = Array.isArray(notifData) ? notifData : [];
+  const unreadCount = notifications.filter((n: any) => !n.isRead).length;
+
+  const handleMarkRead = async (id: string) => {
+    try {
+      await apiClient.patch(`/announcements/notifications/${id}/read`);
+      refetchNotifs();
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await apiClient.patch('/announcements/notifications/read-all');
+      refetchNotifs();
+    } catch (e) {
+      // ignore
+    }
+  };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -194,6 +236,104 @@ export const AppLayout: React.FC = () => {
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            {/* In-App Notifications Bell */}
+            <IconButton
+              onClick={(e) => setNotifAnchorEl(e.currentTarget)}
+              size="medium"
+              aria-label="notifications"
+              sx={{ color: unreadCount > 0 ? 'primary.main' : 'text.secondary' }}
+            >
+              <Badge badgeContent={unreadCount} color="error" max={99}>
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+
+            {/* Notification Popover */}
+            <Popover
+              open={Boolean(notifAnchorEl)}
+              anchorEl={notifAnchorEl}
+              onClose={() => setNotifAnchorEl(null)}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              PaperProps={{
+                sx: { width: 360, maxHeight: 460, borderRadius: 2, boxShadow: 4, display: 'flex', flexDirection: 'column' }
+              }}
+            >
+              <Box sx={{ p: 2, pb: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <NotificationsIcon fontSize="small" color="primary" />
+                  <Typography variant="subtitle2" fontWeight={700}>
+                    Notifications {unreadCount > 0 ? `(${unreadCount} new)` : ''}
+                  </Typography>
+                </Box>
+                {unreadCount > 0 && (
+                  <Button
+                    size="small"
+                    startIcon={<DoneAllIcon fontSize="small" />}
+                    onClick={handleMarkAllRead}
+                    sx={{ textTransform: 'none', fontSize: '0.75rem', p: 0.5 }}
+                  >
+                    Mark all read
+                  </Button>
+                )}
+              </Box>
+
+              <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 1 }}>
+                {notifications.length === 0 ? (
+                  <Box sx={{ p: 3, textAlign: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">
+                      No notifications yet
+                    </Typography>
+                  </Box>
+                ) : (
+                  <List disablePadding>
+                    {notifications.slice(0, 10).map((n: any) => (
+                      <ListItem
+                        key={n.id}
+                        onClick={() => {
+                          if (!n.isRead) handleMarkRead(n.id);
+                        }}
+                        sx={{
+                          p: 1.5,
+                          mb: 0.5,
+                          borderRadius: 1.5,
+                          bgcolor: n.isRead ? 'transparent' : '#f0f9ff',
+                          cursor: 'pointer',
+                          display: 'block',
+                          '&:hover': { bgcolor: '#f1f5f9' }
+                        }}
+                      >
+                        <Typography variant="body2" fontWeight={n.isRead ? 500 : 700} color="text.primary">
+                          {n.title}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25 }}>
+                          {n.content}
+                        </Typography>
+                        <Typography variant="caption" color="text.disabled" sx={{ display: 'block', mt: 0.5, fontSize: '0.7rem' }}>
+                          {new Date(n.createdAt).toLocaleDateString()}
+                        </Typography>
+                      </ListItem>
+                    ))}
+                  </List>
+                )}
+              </Box>
+
+              <Box sx={{ p: 1.5, borderTop: '1px solid #e2e8f0', textAlign: 'center', bgcolor: '#f8fafc' }}>
+                <Button
+                  fullWidth
+                  size="small"
+                  variant="text"
+                  onClick={() => {
+                    setNotifAnchorEl(null);
+                    navigate('/announcements');
+                  }}
+                  sx={{ textTransform: 'none', fontWeight: 600 }}
+                >
+                  View all announcements & alerts →
+                </Button>
+              </Box>
+            </Popover>
+
             <Box sx={{ textAlign: 'right', display: { xs: 'none', md: 'block' } }}>
               <Typography variant="body2" fontWeight={600}>
                 {user?.firstName} {user?.lastName}

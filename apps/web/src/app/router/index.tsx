@@ -15,6 +15,8 @@ import { AttendancePage } from '../../features/attendance/AttendancePage';
 import { ExaminationsPage } from '../../features/examinations/ExaminationsPage';
 import { FeesPage } from '../../features/fees/FeesPage';
 import { TimetablePage } from '../../features/timetable/TimetablePage';
+import { AssignmentsPage } from '../../features/assignments/AssignmentsPage';
+import { AnnouncementsPage } from '../../features/announcements/AnnouncementsPage';
 import { ModulePlaceholderPage } from '../../features/placeholder/ModulePlaceholderPage';
 
 export const router = createBrowserRouter([
@@ -125,21 +127,17 @@ export const router = createBrowserRouter([
       {
         path: 'assignments',
         element: (
-          <ModulePlaceholderPage
-            moduleName="Assignments & Homework"
-            phase="Phase 6 Scheduled Module"
-            description="Homework creation, file attachments, student submission portal, and grading review."
-          />
+          <ProtectedRoute requiredPermission="assignments.view">
+            <AssignmentsPage />
+          </ProtectedRoute>
         )
       },
       {
         path: 'announcements',
         element: (
-          <ModulePlaceholderPage
-            moduleName="Announcements & Alerts"
-            phase="Phase 7 Scheduled Module"
-            description="Multi-channel announcements targeting schools, classes, teachers, or parents with in-app notifications."
-          />
+          <ProtectedRoute requiredPermission="announcements.view">
+            <AnnouncementsPage />
+          </ProtectedRoute>
         )
       },
       {

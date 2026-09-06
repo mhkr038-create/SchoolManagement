@@ -1,4 +1,4 @@
-export * from './common';
+﻿export * from './common';
 export * from './school';
 export * from './rbac';
 export * from './user';
@@ -10,3 +10,6 @@ export * from './attendance';
 export * from './examination';
 export * from './fees';
 export * from './timetable';
+
+export * from './assignments';
+export * from './announcements';
