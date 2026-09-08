@@ -4,7 +4,17 @@
   "private": true,
   "packageManager": "pnpm@11.21.0",
   "engines": {
-    "node": ">=20.0.0"
+    "node": "22.x"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@embedded-postgres/linux-x64",
+      "@embedded-postgres/windows-x64",
+      "@prisma/client",
+      "@prisma/engines",
+      "esbuild",
+      "prisma"
+    ]
   },
   "scripts": {
     "start:db": "node scripts/start-db.js",
