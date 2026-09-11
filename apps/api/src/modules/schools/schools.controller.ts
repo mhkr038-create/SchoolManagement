@@ -3,6 +3,8 @@ import {
   Get,
   Patch,
   Body,
+  Query,
+  Req,
   UseGuards
 } from '@nestjs/common';
 import { SchoolsService } from './schools.service';
@@ -40,8 +42,22 @@ export class SchoolsController {
   @RequirePermissions('school.settings.edit')
   async updateCurrentSchool(
     @CurrentSchool() schoolId: string,
+    @CurrentUser() user: any,
+    @Req() req: any,
     @Body() body: any
   ) {
-    return this.schoolsService.updateSchoolProfile(schoolId, body);
+    const ip = req?.headers?.['x-forwarded-for'] || req?.socket?.remoteAddress || '127.0.0.1';
+    const userAgent = req?.headers?.['user-agent'] || 'School ERP';
+    return this.schoolsService.updateSchoolProfile(schoolId, body, user?.id, ip, userAgent);
+  }
+
+  @Get('audit-logs')
+  @UseGuards(JwtAuthGuard, SchoolContextGuard, PermissionsGuard)
+  @RequirePermissions('school.settings.view')
+  async getAuditLogs(
+    @CurrentSchool() schoolId: string,
+    @Query() query: any
+  ) {
+    return this.schoolsService.getAuditLogs(schoolId, query);
   }
 }

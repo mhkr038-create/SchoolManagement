@@ -17,6 +17,7 @@ import { FeesPage } from '../../features/fees/FeesPage';
 import { TimetablePage } from '../../features/timetable/TimetablePage';
 import { AssignmentsPage } from '../../features/assignments/AssignmentsPage';
 import { AnnouncementsPage } from '../../features/announcements/AnnouncementsPage';
+import { SettingsPage } from '../../features/settings/SettingsPage';
 import { ModulePlaceholderPage } from '../../features/placeholder/ModulePlaceholderPage';
 
 export const router = createBrowserRouter([
@@ -143,11 +144,9 @@ export const router = createBrowserRouter([
       {
         path: 'settings',
         element: (
-          <ModulePlaceholderPage
-            moduleName="School Configuration & Settings"
-            phase="Phase 1 Active Module"
-            description="School organization profile, branding, audit logs inspection, and academic years configuration."
-          />
+          <ProtectedRoute requiredPermission="school.settings.view">
+            <SettingsPage />
+          </ProtectedRoute>
         )
       },
       {

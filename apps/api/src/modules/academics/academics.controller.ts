@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Body,
   Param,
   Query,
@@ -26,6 +27,34 @@ export class AcademicsController {
   @RequirePermissions('academics.view')
   async listYears(@CurrentSchool() schoolId: string) {
     return this.academicsService.listAcademicYears(schoolId);
+  }
+
+  @Post('years')
+  @RequirePermissions('academics.manage')
+  async createYear(
+    @CurrentSchool() schoolId: string,
+    @Body() body: any
+  ) {
+    return this.academicsService.createAcademicYear(schoolId, body);
+  }
+
+  @Patch('years/:id/set-current')
+  @RequirePermissions('academics.manage')
+  async setCurrentYear(
+    @CurrentSchool() schoolId: string,
+    @Param('id') yearId: string
+  ) {
+    return this.academicsService.setCurrentAcademicYear(schoolId, yearId);
+  }
+
+  @Post('years/:id/terms')
+  @RequirePermissions('academics.manage')
+  async createTerm(
+    @CurrentSchool() schoolId: string,
+    @Param('id') yearId: string,
+    @Body() body: any
+  ) {
+    return this.academicsService.createAcademicTerm(schoolId, yearId, body);
   }
 
   @Get('classes')
